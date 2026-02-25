@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Klassifiers — AI Chat</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+
+  <style>
+    /* ================= VARIABLES ================= */
+    :root {
+      --primary: #002568;
+      --bg: #f7f9fc;
+      --panel: #ffffff;
+      --muted: #5f6368;
+      --border: #e0e3eb;
+      --ai-bg: #f1f4f9;
+    }
+
+    /* ================= RESET ================= */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: #202124;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ================= HEADER ================= */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      height: 64px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+
+    .brand img {
+      width: 28px;
+    }
+
+    /* ================= APP ================= */
+    .app {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width: 280px;
+      background: #f8fafd;
+      border-right: 1px solid var(--border);
+      padding: 16px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      background: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .db-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .db-item:hover {
+      background: #eef2fb;
+    }
+
+    .db-item.active {
+      background: #e8f0fe;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .db-dropdown {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    /* ================= CHAT AREA ================= */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .chat-scroll {
+      width: 100%;
+      max-width: 900px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 16px 160px;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ================= MESSAGES ================= */
+    .msg {
+      max-width: 75%;
+      font-size: 16px;
+      line-height: 1.6;
+      padding: 14px 18px;
+      border-radius: 18px;
+    }
+
+    .msg.ai {
+      align-self: flex-start;
+      background: var(--ai-bg);
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: #e8f0fe;
+      color: #202124;
+    }
+
+    /* ================= INPUT ================= */
+    .input-bar {
+      position: fixed;
+      bottom: 0;
+      left: 280px;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(to top, var(--bg) 70%, transparent);
+    }
+
+    .input-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    textarea {
+      flex: 1;
+      border: none;
+      resize: none;
+      font-size: 16px;
+      padding: 10px 6px;
+      max-height: 160px;
+    }
+
+    textarea::placeholder {
+      color: #9aa0a6;
+    }
+
+    textarea:focus {
+      outline: none;
+    }
+
+    .send {
+      border: none;
+      background: #1a73e8;
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ================= FOOTER ================= */
+    .footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 14px;
+      color: #5f6368;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 900px) {
+      .sidebar-toggle {
+        display: inline-flex;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        transition: 0.25s;
+        z-index: 200;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .input-bar {
+        left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header class="site-header">
+    <div class="header-left">
+      <button class="sidebar-toggle" id="toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="brand">
+        <img src="{{ url_for('static', path='logo.png') }}" />
+        Klassifiers
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= APP ================= -->
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <button>+ New Chat</button>
+      <button>Connect Database</button>
+
+      <div class="section">
+        <div class="section-title">Select Database</div>
+        <select id="dbSelect" class="db-dropdown">
+          <option value="">Select DataBase</option>
+        </select>
+      </div>
+    </aside>
+
+    <!-- CHAT -->
+    <main class="chat-area">
+      <div class="chat-scroll">
+        <div class="chat" id="chat">
+          <div class="msg ai">
+            Hello 👋
+            Ask questions about your database, just like talking to Gemini.
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <textarea id="input" placeholder="Ask your database anything…"></textarea>
+      <button class="send" id="send">
+        <i class="fas fa-arrow-up"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    © 2025 Klassifiers. All rights reserved.
+  </footer>
+
+  <!-- ================= SCRIPT ================= -->
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const toggle = document.getElementById("toggle");
+    const sidebar = document.getElementById("sidebar");
+
+    send.onclick = () => {
+      const q = input.value.trim();
+      if (!q) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "msg user";
+      userMsg.textContent = q;
+      chat.appendChild(userMsg);
+
+      input.value = "";
+
+      setTimeout(() => {
+        const aiMsg = document.createElement("div");
+        aiMsg.className = "msg ai";
+        aiMsg.textContent =
+          "Klassifier helps you to talk with your database";
+        chat.appendChild(aiMsg);
+        aiMsg.scrollIntoView({ behavior: "smooth" });
+      }, 700);
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send.click();
+      }
+    });
+
+    toggle.onclick = () => {
+      sidebar.classList.toggle("open");
+    };
+  </script>
+
+</body>
+</html>

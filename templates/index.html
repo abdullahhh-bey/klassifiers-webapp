@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klassifiers — Welcome</title>
+
+  <style>
+    :root {
+      --primary: #002568;
+      --bg: #f4f6fb;
+      --black: #0b1220;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: white;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e6e9ef;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .brand .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    /* Center Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .logo {
+      width: 130px;
+      height: auto;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin: 0;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 16px 10px;
+      background: white;
+      border-top: 1px solid #e6e9ef;
+      color: var(--black);
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <img src="{{ url_for('static', path='logo.png') }}" alt="Klassifiers Logo">
+      <div class="title">Klassifiers</div>
+    </div>
+  </header>
+
+  <!-- Center Content -->
+  <div class="main-content">
+    <div>
+      <img src="{{ url_for('static', path='logo.png') }}" alt="Klassifiers Logo" class="logo">
+      <h1>Klassifiers</h1>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 Klassifiers. All Rights Reserved.
+  </footer>
+
+</body>
+</html>
