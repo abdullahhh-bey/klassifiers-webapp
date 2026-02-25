@@ -4,17 +4,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 
-DATABASE_URL = (
-    "mssql+pyodbc://@DESKTOP-D642JM0/klassifier"
-    "?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
-)
+DATABASE_URL = "sqlite:///./klassifier.db"
 
 
 # ----- SQLAlchemy Engine -----
 engine = create_engine(
     DATABASE_URL,
+    connect_args={"check_same_thread": False},
     echo=True,           # show SQL logs
-    fast_executemany=True
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

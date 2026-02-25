@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Klassifiers — Welcome</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Klassifiers — AI Database Assistant</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
     :root {
       --primary: #002568;
       --bg: #f4f6fb;
+      --muted: #777;
+      --header-border: #e9edf2;
       --black: #0b1220;
+    }
+
+    * {
+      box-sizing: border-box
     }
 
     body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
+      font-family: Inter, Arial, Helvetica, sans-serif;
       background: var(--bg);
       color: var(--primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
     }
 
-    /* Header */
-    header {
-      background: white;
-      padding: 14px 24px;
+    /* ---------- SLIM HEADER ---------- */
+    .site-header {
       display: flex;
       align-items: center;
-      border-bottom: 1px solid #e6e9ef;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--header-border);
+      position: sticky;
+      top: 0;
+      z-index: 80;
       height: 64px;
     }
 
@@ -39,75 +54,423 @@
     }
 
     .brand img {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       object-fit: contain;
     }
 
     .brand .title {
-      font-size: 20px;
       font-weight: 700;
+      font-size: 18px;
+      color: var(--black);
+      letter-spacing: 0.2px;
+    }
+
+    /* Right nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .nav a.link {
+      color: var(--black);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .nav .signin {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d0d6db;
+      background: transparent;
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+
+    .nav .signin:hover {
+      background: #f4f6fb;
+    }
+
+    .nav .get-started {
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.08);
+      transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .nav .get-started:hover {
+      background: #00194b;
+      transform: translateY(-1px);
+    }
+
+    .hamburger {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .hamburger .bar {
+      font-size: 18px;
       color: var(--black);
     }
 
-    /* Center Content */
-    .main-content {
+    .mobile-menu {
+      position: absolute;
+      right: 12px;
+      top: 64px;
+      background: #fff;
+      border: 1px solid #e6ecf2;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10, 20, 40, 0.08);
+      width: 200px;
+      display: none;
+      flex-direction: column;
+      padding: 8px 6px;
+      z-index: 90;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: block;
+      padding: 10px 12px;
+      color: var(--black);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      margin: 4px;
+    }
+
+    .mobile-menu a:hover {
+      background: #f6f9fc;
+    }
+
+    .mobile-menu a.cta {
+      background: var(--primary);
+      color: #fff !important;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ---------- HERO SECTION ---------- */
+    .hero {
       flex: 1;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
       text-align: center;
-      padding: 20px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .logo {
-      width: 130px;
-      height: auto;
-      margin-bottom: 16px;
+    /* Subtle background glow */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 37, 104, 0.06) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      pointer-events: none;
     }
 
-    h1 {
-      font-size: 34px;
-      margin: 0;
-      color: var(--primary);
+    .hero h1 {
+      font-size: 54px;
       font-weight: 800;
+      line-height: 1.1;
+      color: var(--black);
+      margin: 0 0 20px 0;
+      max-width: 800px;
+      letter-spacing: -1px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(90deg, #002568, #2a5bd7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 0 40px 0;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 14px 28px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 8px 20px rgba(0, 37, 104, 0.15);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-primary:hover {
+      background: #00194b;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 37, 104, 0.2);
+    }
+
+    .btn-secondary {
+      padding: 14px 28px;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--black);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      border: 1px solid #d0d6db;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #f4f6fb;
+      border-color: var(--black);
+    }
+
+    /* ---------- FEATURES ---------- */
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 40px 20px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .feature-card {
+      background: #fff;
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid #eef3f8;
+      width: 300px;
+      flex: 1;
+      min-width: 250px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: left;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 37, 104, 0.06);
+    }
+
+    .feature-card i {
+      font-size: 32px;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      color: var(--black);
+      margin: 0 0 12px 0;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0;
     }
 
     /* Footer */
-    footer {
+    .footer {
       text-align: center;
-      padding: 16px 10px;
-      background: white;
-      border-top: 1px solid #e6e9ef;
-      color: var(--black);
+      padding: 24px 12px;
       font-size: 14px;
+      color: var(--black);
+      opacity: 0.7;
+      border-top: 1px solid #eef2f6;
     }
 
+    /* Responsive */
+    @media (max-width:720px) {
+
+      .nav a.link,
+      .nav .get-started {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav .signin {
+        display: inline-flex;
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .mobile-menu {
+        right: 8px;
+        left: 8px;
+        width: auto;
+      }
+
+      .hero h1 {
+        font-size: 40px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .hero-buttons a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-width:420px) {
+      .site-header {
+        padding: 10px 12px;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+    }
   </style>
 </head>
 
 <body>
 
   <!-- Header -->
-  <header>
+  <header class="site-header">
     <div class="brand">
-      <img src="{{ url_for('static', path='logo.png') }}" alt="Klassifiers Logo">
+      <img src="{{ url_for('static', path='logo.png') }}" alt="Klassifiers logo" />
       <div class="title">Klassifiers</div>
+    </div>
+
+    <nav class="nav">
+      <a class="link hide-sm" href="/">Home</a>
+      <a class="link hide-sm" href="#">Pricing</a>
+      <a class="signin" href="/login">Sign In</a>
+      <a class="get-started" href="/signup">Get Started</a>
+
+      <button class="hamburger" id="hamburger" aria-expanded="false">
+        <span class="bar"><i class="fas fa-bars"></i></span>
+      </button>
+    </nav>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/">Home</a>
+      <a href="#">Pricing</a>
+      <a href="/login">Sign In</a>
+      <a class="cta" href="/signup">Get Started</a>
     </div>
   </header>
 
-  <!-- Center Content -->
-  <div class="main-content">
-    <div>
-      <img src="{{ url_for('static', path='logo.png') }}" alt="Klassifiers Logo" class="logo">
-      <h1>Klassifiers</h1>
+  <!-- Hero Section -->
+  <main class="hero">
+    <h1>Chat with your database in <span>plain English</span></h1>
+    <p>Klassifiers securely connects to your PostgreSQL, MySQL, or ClickHouse instances to give you instant AI-powered
+      insights. No SQL required.</p>
+
+    <div class="hero-buttons">
+      <a href="/signup" class="btn-primary">Start for free <i class="fas fa-arrow-right"
+          style="margin-left:6px; font-size:14px;"></i></a>
+      <a href="/login" class="btn-secondary">Sign In</a>
     </div>
-  </div>
+  </main>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="feature-card">
+      <i class="fas fa-shield-alt"></i>
+      <h3>Secure Connections</h3>
+      <p>Your database credentials are encrypted and stored safely. We never execute destructive queries, keeping your
+        data completely safe.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-bolt"></i>
+      <h3>Lightning Fast</h3>
+      <p>Powered by advanced AI models tailored to understand complex schema structures and generate optimized queries
+        instantly.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-chart-line"></i>
+      <h3>Deeper Insights</h3>
+      <p>Ask questions naturally and let the AI find the exact figures, trends, and anomalies from millions of rows
+        without writing a single script.</p>
+    </div>
+  </section>
 
   <!-- Footer -->
-  <footer>
-    © 2025 Klassifiers. All Rights Reserved.
+  <footer class="footer">
+    © 2025 Klassifiers. All rights reserved.
   </footer>
 
+  <script>
+    /* =========================
+       Mobile menu
+    ========================== */
+    const hamburger = document.getElementById("hamburger");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener("click", () => {
+        mobileMenu.classList.toggle("open");
+        hamburger.setAttribute(
+          "aria-expanded",
+          mobileMenu.classList.contains("open")
+        );
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+          mobileMenu.classList.remove("open");
+        }
+      });
+    }
+  </script>
+
 </body>
+
 </html>

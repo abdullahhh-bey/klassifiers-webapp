@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-from openai import OpenAI
+# from openai import OpenAI
 from pydantic import BaseModel
 
 from Infrastructure.database import engine, Base, get_db
@@ -17,9 +17,9 @@ from Application.auth import get_password_hash, verify_password
 # ----------------- ENV -----------------
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY not found in .env")
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# if not OPENAI_API_KEY:
+#     raise RuntimeError("OPENAI_API_KEY not found in .env")
 
 DB_SECRET_KEY = os.getenv("DB_SECRET_KEY")
 if not DB_SECRET_KEY:
@@ -27,7 +27,7 @@ if not DB_SECRET_KEY:
 
 
 # ----------------- CLIENTS -----------------
-client = OpenAI(api_key=OPENAI_API_KEY)
+# client = OpenAI(api_key=OPENAI_API_KEY)
 fernet = Fernet(DB_SECRET_KEY.encode())
 
 
