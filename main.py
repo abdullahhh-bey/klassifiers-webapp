@@ -211,7 +211,7 @@ def chat_with_database(
         sql_db = SQLDatabase.from_uri(db_uri)
 
         # 2. Initialize Gemini Model
-        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=GEMINI_API_KEY)
+        llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=GEMINI_API_KEY)
         
         # 3. Setup Agent Tools
         toolkit = SQLDatabaseToolkit(db=sql_db, llm=llm)
@@ -231,7 +231,7 @@ NEVER make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the databas
         agent_executor = create_react_agent(
             llm,
             tools,
-            messages_modifier=system_prompt,
+            prompt=system_prompt,
             checkpointer=memory,
         )
 
@@ -245,7 +245,17 @@ NEVER make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the databas
             config=config
         )
 
-        final_msg = response["messages"][-1].content
+        final_msg_raw = response["messages"][-1].content
+        if isinstance(final_msg_raw, list):
+            parts = []
+            for part in final_msg_raw:
+                if isinstance(part, str):
+                    parts.append(part)
+                elif isinstance(part, dict) and "text" in part:
+                    parts.append(part["text"])
+            final_msg = "".join(parts)
+        else:
+            final_msg = str(final_msg_raw)
 
         return {
             "response": final_msg
