@@ -376,16 +376,19 @@
       <div class="title">Klassifiers</div>
     </div>
 
-    <nav class="nav">
-      <a class="link hide-sm" href="/">Home</a>
-      <a class="link hide-sm" href="#">Pricing</a>
-      <a class="signin" href="/login">Sign In</a>
-      <a class="get-started" href="/signup">Get Started</a>
+    <div class="nav" id="nav-menu">
+      <a href="/" class="link">Home</a>
+      <a href="#features" class="link">Features</a>
+      <a href="#pricing" class="link">Pricing</a>
+      <a href="/database-connection" class="link">Connect DB</a>
+      <a href="/chat" class="link">Chat</a>
+      <a href="/login" class="link signin" id="nav-signin">Sign In</a>
+      <a href="/signup" class="get-started" id="nav-signup">Get Started</a>
 
       <button class="hamburger" id="hamburger" aria-expanded="false">
         <span class="bar"><i class="fas fa-bars"></i></span>
       </button>
-    </nav>
+    </div>
 
     <div class="mobile-menu" id="mobile-menu">
       <a href="/">Home</a>
@@ -726,6 +729,9 @@
 
           alert("Database connection saved successfully ✅");
           form.reset();
+
+          // Redirect to Chat page
+          window.location.href = "/chat";
 
         } catch (err) {
           alert("Error: " + err.message);

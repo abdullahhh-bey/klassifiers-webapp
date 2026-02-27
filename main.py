@@ -198,7 +198,7 @@ def chat_with_database(
         # Construct DB URI dynamically based on user's connection details
         db_type = connection.db_type.lower()
         if db_type == "postgresql":
-            db_uri = f"postgresql+psycopg2://{connection.username}:{decrypted_password}@{connection.host}:{connection.port}/{connection.db_name}"
+            db_uri = f"postgresql+psycopg2://{connection.username}:{decrypted_password}@{connection.host}:{connection.port}/{connection.db_name}?sslmode=require"
         elif db_type == "mysql":
             db_uri = f"mysql+pymysql://{connection.username}:{decrypted_password}@{connection.host}:{connection.port}/{connection.db_name}"
         elif db_type == "clickhouse":
@@ -231,7 +231,7 @@ NEVER make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the databas
         agent_executor = create_react_agent(
             llm,
             tools,
-            state_modifier=system_prompt,
+            messages_modifier=system_prompt,
             checkpointer=memory,
         )
 
