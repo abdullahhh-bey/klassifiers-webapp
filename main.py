@@ -6,7 +6,11 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-from openai import OpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.utilities import SQLDatabase
+from langchain_community.agent_toolkits import SQLDatabaseToolkit
+from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import MemorySaver
 from pydantic import BaseModel
 
 from Infrastructure.database import engine, Base, get_db
@@ -17,9 +21,9 @@ from Application.auth import get_password_hash, verify_password
 # ----------------- ENV -----------------
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY not found in .env")
+GEMINI_API_KEY = os.getenv("geminiAPI")
+if not GEMINI_API_KEY:
+    raise RuntimeError("geminiAPI not found in .env")
 
 DB_SECRET_KEY = os.getenv("DB_SECRET_KEY")
 if not DB_SECRET_KEY:
@@ -27,8 +31,8 @@ if not DB_SECRET_KEY:
 
 
 # ----------------- CLIENTS -----------------
-client = OpenAI(api_key=OPENAI_API_KEY)
 fernet = Fernet(DB_SECRET_KEY.encode())
+memory = MemorySaver()
 
 
 # ----------------- MODELS -----------------
@@ -191,53 +195,80 @@ def chat_with_database(
                 detail="Failed to decrypt database credentials"
             )
 
-        system_prompt = f"""
-You are a secure AI database assistant.
+        # Construct DB URI dynamically based on user's connection details
+        db_type = connection.db_type.lower()
+        if db_type == "postgresql":
+            db_uri = f"postgresql+psycopg2://{connection.username}:{decrypted_password}@{connection.host}:{connection.port}/{connection.db_name}?sslmode=require"
+        elif db_type == "mysql":
+            db_uri = f"mysql+pymysql://{connection.username}:{decrypted_password}@{connection.host}:{connection.port}/{connection.db_name}"
+        elif db_type == "clickhouse":
+            # Using clickhouse-connect for clickhouse
+            db_uri = f"clickhouse+connect://{connection.username}:{decrypted_password}@{connection.host}:{connection.port}/{connection.db_name}"
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported database type")
 
-Database type: {connection.db_type}
+        # 1. Initialize DB Toolkit
+        sql_db = SQLDatabase.from_uri(db_uri)
 
-Rules:
-- Never expose SQL
-- Never expose credentials
-- Never mention passwords
-- Explain results in simple English
-- Ask for clarification if query is unsafe or unclear
-"""
+        # 2. Initialize Gemini Model
+        llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=GEMINI_API_KEY)
+        
+        # 3. Setup Agent Tools
+        toolkit = SQLDatabaseToolkit(db=sql_db, llm=llm)
+        tools = toolkit.get_tools()
+        
+        # 4. Agent System Prompt
+        system_prompt = f"""You are a helpful database assistant.
+You are querying a {connection.db_type} database.
+Given an input question, create a syntactically correct SQL query to run, then look at the results of the query and return the answer.
+Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most 10 results.
+Never query for all the columns from a specific table, only ask for the relevant columns given the question.
+If you get an error while executing a query, rewrite the query and try again.
+If you get an empty result set, you should try to rewrite the query to get a non-empty result set.
+NEVER make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database. Explain the result to the user clearly."""
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": payload.message},
-            ],
+        # 5. Create LangGraph React Agent
+        agent_executor = create_react_agent(
+            llm,
+            tools,
+            prompt=system_prompt,
+            checkpointer=memory,
         )
 
+        # 6. Session Management (Per Database Connection)
+        thread_id = f"user_{connection.user_id}_db_{connection.id}"
+        config = {"configurable": {"thread_id": thread_id}}
+
+        # 7. Run Agent
+        response = agent_executor.invoke(
+            {"messages": [("user", payload.message)]}, 
+            config=config
+        )
+
+        final_msg_raw = response["messages"][-1].content
+        if isinstance(final_msg_raw, list):
+            parts = []
+            for part in final_msg_raw:
+                if isinstance(part, str):
+                    parts.append(part)
+                elif isinstance(part, dict) and "text" in part:
+                    parts.append(part["text"])
+            final_msg = "".join(parts)
+        else:
+            final_msg = str(final_msg_raw)
+
         return {
-            "response": response.choices[0].message.content
+            "response": final_msg
         }
 
     except HTTPException:
         raise
-
     except Exception as e:
         print("CHAT ERROR:", e)
         raise HTTPException(
             status_code=500,
-            detail="Failed to process your request"
+            detail=str(e)
         )
-
-
-# ----------------- ANALYZE (OPTIONAL) -----------------
-@app.post("/api/analyze")
-def analyze(payload: AnalyzeRequest):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a data analyst."},
-            {"role": "user", "content": payload.query},
-        ],
-    )
-    return {"result": response.choices[0].message.content}
 
 
 # ----------------- RUN -----------------

@@ -1,274 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Klassifiers — Sign Up</title>
 
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    :root{
+    :root {
       --primary: #002568;
       --bg: #f4f6fb;
       --muted: #777;
       --header-border: #e9edf2;
       --black: #0b1220;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
       font-family: Inter, Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--primary);
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      flex-direction:column;
+      background: var(--bg);
+      color: var(--primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ---------- SLIM HEADER ---------- */
     .site-header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px 20px;
-      background:#fff;
-      border-bottom:1px solid var(--header-border);
-      position:sticky;
-      top:0;
-      z-index:80;
-      height:64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--header-border);
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      height: 64px;
     }
 
     .brand {
-      display:flex;
-      align-items:center;
-      gap:12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .brand img{ width:28px; height:28px; object-fit:contain; }
-    .brand .title{ font-weight:700; font-size:18px; color:var(--black); letter-spacing:0.2px; }
+    .brand img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .brand .title {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--black);
+      letter-spacing: 0.2px;
+    }
 
     /* Right nav */
     .nav {
-      display:flex;
-      align-items:center;
-      gap:22px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
     }
 
-    .nav a.link{
-      color:var(--black);
-      text-decoration:none;
-      font-size:15px;
-      font-weight:600;
+    .nav a.link {
+      color: var(--black);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
     }
 
-    .nav .signin{
-      padding:8px 12px;
-      border-radius:8px;
-      border:1px solid #d0d6db;
-      background:transparent;
-      color:var(--black);
-      font-weight:700;
-      text-decoration:none;
-      font-size:14px;
+    .nav .signin {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d0d6db;
+      background: transparent;
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
     }
 
-    .nav .get-started{
-      color:var(--black);
-      font-weight:700;
-      text-decoration:none;
-      font-size:15px;
+    .nav .get-started {
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 15px;
     }
 
     /* CTA */
     .nav .cta {
-      padding:8px 14px;
-      border-radius:8px;
-      background:var(--primary);
-      color:#fff !important;
-      text-decoration:none;
-      font-weight:700;
-      font-size:14px;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.08);
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.08);
     }
 
     /* Hamburger */
     .hamburger {
-      display:none;
-      width:40px;
-      height:40px;
-      border-radius:8px;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      background:transparent;
-      border:1px solid transparent;
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
     }
 
-    .hamburger .bar{ font-size:18px; color:var(--black); }
+    .hamburger .bar {
+      font-size: 18px;
+      color: var(--black);
+    }
 
     /* Mobile menu */
     .mobile-menu {
-      position:absolute;
-      right:12px;
-      top:64px;
-      background:#fff;
-      border:1px solid #e6ecf2;
-      border-radius:10px;
-      box-shadow:0 8px 28px rgba(10,20,40,0.08);
-      width:200px;
-      display:none;
-      flex-direction:column;
-      padding:8px 6px;
-      z-index:90;
+      position: absolute;
+      right: 12px;
+      top: 64px;
+      background: #fff;
+      border: 1px solid #e6ecf2;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10, 20, 40, 0.08);
+      width: 200px;
+      display: none;
+      flex-direction: column;
+      padding: 8px 6px;
+      z-index: 90;
     }
-    .mobile-menu.open{ display:flex; }
 
-    .mobile-menu a{
-      display:block;
-      padding:10px 12px;
-      color:var(--black);
-      text-decoration:none;
-      font-weight:600;
-      border-radius:8px;
-      margin:4px;
+    .mobile-menu.open {
+      display: flex;
     }
-    .mobile-menu a:hover{ background:#f6f9fc; }
+
+    .mobile-menu a {
+      display: block;
+      padding: 10px 12px;
+      color: var(--black);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      margin: 4px;
+    }
+
+    .mobile-menu a:hover {
+      background: #f6f9fc;
+    }
 
     /* ---------- Page & Form ---------- */
-    .page-wrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 16px;
-      flex:1 0 auto;
+    .page-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+      flex: 1 0 auto;
     }
 
     .container {
-      width:380px;
-      max-width:92%;
-      background:#fff;
-      padding:28px;
-      border-radius:12px;
-      border:1px solid #eef3f8;
-      box-shadow: 0 8px 25px rgba(0,37,104,0.12);
+      width: 380px;
+      max-width: 92%;
+      background: #fff;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #eef3f8;
+      box-shadow: 0 8px 25px rgba(0, 37, 104, 0.12);
     }
 
-    h2{
-      text-align:center;
-      margin:0 0 18px 0;
-      color:var(--primary);
-      font-size:22px;
+    h2 {
+      text-align: center;
+      margin: 0 0 18px 0;
+      color: var(--primary);
+      font-size: 22px;
     }
 
-    label{
-      display:block;
-      font-weight:700;
-      margin-bottom:8px;
-      color:var(--primary);
-      font-size:13px;
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: 13px;
     }
 
-    .form-group{ margin-bottom:16px; }
-
-    .input-with-icon{ position:relative; width:100%; }
-
-    .icon-left{
-      position:absolute;
-      left:12px;
-      top:50%;
-      transform:translateY(-50%);
-      color:var(--muted);
-      pointer-events:none;
+    .form-group {
+      margin-bottom: 16px;
     }
 
-    input.form-control{
-      width:100%;
-      padding:12px 42px;
-      border-radius:10px;
-      border:1px solid #dde6ef;
-      background:#fbfdff;
-      font-size:14px;
-      color:var(--primary);
+    .input-with-icon {
+      position: relative;
+      width: 100%;
     }
 
-    input.form-control:focus{
-      outline:none;
-      box-shadow:0 0 8px rgba(0,37,104,0.12);
-      border-color:var(--primary);
-      background:#fff;
+    .icon-left {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
     }
 
-    .toggle-password{
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      cursor:pointer;
-      color:var(--primary);
-      font-size:16px;
+    input.form-control {
+      width: 100%;
+      padding: 12px 42px;
+      border-radius: 10px;
+      border: 1px solid #dde6ef;
+      background: #fbfdff;
+      font-size: 14px;
+      color: var(--primary);
     }
 
-    button[type="submit"]{
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      background:var(--primary);
-      color:#fff;
-      border:none;
-      font-weight:700;
-      font-size:15px;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.12);
+    input.form-control:focus {
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 37, 104, 0.12);
+      border-color: var(--primary);
+      background: #fff;
     }
 
-    .already{
-      text-align:center;
-      margin-top:14px;
-      font-size:14px;
-      color:var(--primary);
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 16px;
     }
-    .already a{
-      font-weight:700;
-      color:var(--primary);
-      text-decoration:none;
-      margin-left:6px;
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      font-size: 15px;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.12);
+    }
+
+    .already {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--primary);
+    }
+
+    .already a {
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      margin-left: 6px;
     }
 
     /* Footer */
-    .footer{
-      text-align:center;
-      padding:14px 12px;
-      font-size:14px;
-      color:var(--black);
-      opacity:0.7;
-      border-top:1px solid #eef2f6;
-      flex-shrink:0;
+    .footer {
+      text-align: center;
+      padding: 14px 12px;
+      font-size: 14px;
+      color: var(--black);
+      opacity: 0.7;
+      border-top: 1px solid #eef2f6;
+      flex-shrink: 0;
     }
 
     /* Responsive */
-    @media (max-width:720px){
+    @media (max-width:720px) {
+
       .nav a.link,
-      .nav .get-started { display:none; }
-      .hamburger { display:flex; }
-      .nav .signin{
-        display:inline-flex;
-        padding:6px 10px;
-        font-size:13px;
+      .nav .get-started {
+        display: none;
       }
-      .mobile-menu{
-        right:8px;
-        left:8px;
-        width:auto;
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav .signin {
+        display: inline-flex;
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .mobile-menu {
+        right: 8px;
+        left: 8px;
+        width: auto;
       }
     }
 
-    @media (max-width:420px){
-      .site-header{ padding:10px 12px; }
-      .brand .title{ font-size:16px; }
+    @media (max-width:420px) {
+      .site-header {
+        padding: 10px 12px;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -283,10 +325,10 @@
     </div>
 
     <nav class="nav">
-      <a class="link hide-sm" href="#">Home</a>
+      <a class="link hide-sm" href="/">Home</a>
       <a class="link hide-sm" href="#">Pricing</a>
-      <a class="signin" href="#">Sign In</a>
-      <a class="get-started" href="#">Get Started</a>
+      <a class="signin" href="/login">Sign In</a>
+      <a class="get-started" href="/signup">Get Started</a>
 
       <button class="hamburger" id="hamburger" aria-expanded="false">
         <span class="bar"><i class="fas fa-bars"></i></span>
@@ -294,10 +336,10 @@
     </nav>
 
     <div class="mobile-menu" id="mobile-menu">
-      <a href="#">Home</a>
+      <a href="/">Home</a>
       <a href="#">Pricing</a>
-      <a href="#">Sign In</a>
-      <a class="cta" href="#">Get Started</a>
+      <a href="/login">Sign In</a>
+      <a class="cta" href="/signup">Get Started</a>
     </div>
   </header>
 
@@ -340,15 +382,9 @@
           <label for="password">Password</label>
           <div class="input-with-icon">
             <i class="fas fa-lock icon-left"></i>
-            <input
-              id="password"
-              class="form-control"
-              type="password"
-              placeholder="Create a password"
-              required
+            <input id="password" class="form-control" type="password" placeholder="Create a password" required
               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$"
-              title="Password must be at least 8 characters long and include uppercase, lowercase, and number."
-            >
+              title="Password must be at least 8 characters long and include uppercase, lowercase, and number.">
             <i class="fas fa-eye toggle-password" data-target="password"></i>
           </div>
         </div>
@@ -365,13 +401,8 @@
           <label for="confirmPassword">Confirm Password</label>
           <div class="input-with-icon">
             <i class="fas fa-lock icon-left"></i>
-            <input
-              id="confirmPassword"
-              class="form-control"
-              type="password"
-              placeholder="Re-enter your password"
-              required
-            >
+            <input id="confirmPassword" class="form-control" type="password" placeholder="Re-enter your password"
+              required>
             <i class="fas fa-eye toggle-password" data-target="confirmPassword"></i>
           </div>
         </div>
@@ -380,7 +411,7 @@
 
         <p class="already">
           Already have an account?
-          <a href="login.html">Login</a>
+          <a href="/login">Login</a>
         </p>
 
       </form>
@@ -392,177 +423,178 @@
     © 2025 Klassifiers. All rights reserved.
   </footer>
 
-<script>
-  /* =========================
-     Mobile menu
-  ========================== */
-  const hamburger = document.getElementById("hamburger");
-  const mobileMenu = document.getElementById("mobile-menu");
+  <script>
+    /* =========================
+       Mobile menu
+    ========================== */
+    const hamburger = document.getElementById("hamburger");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-  if (hamburger && mobileMenu) {
-    hamburger.addEventListener("click", () => {
-      mobileMenu.classList.toggle("open");
-      hamburger.setAttribute(
-        "aria-expanded",
-        mobileMenu.classList.contains("open")
-      );
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
-        mobileMenu.classList.remove("open");
-      }
-    });
-  }
-
-  /* =========================
-     Password toggle icons
-  ========================== */
-  document.querySelectorAll(".toggle-password").forEach((icon) => {
-    icon.addEventListener("click", function () {
-      const input = document.getElementById(this.dataset.target);
-      if (!input) return;
-
-      const isHidden = input.type === "password";
-      input.type = isHidden ? "text" : "password";
-
-      this.classList.toggle("fa-eye");
-      this.classList.toggle("fa-eye-slash");
-    });
-  });
-
-  /* =========================
-     Strong password checker
-  ========================== */
-  function isStrongPassword(password) {
-    // At least 8 chars, 1 uppercase, 1 lowercase, 1 digit
-    const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return strongRegex.test(password);
-  }
-
-  const passwordInput = document.getElementById("password");
-  if (passwordInput) {
-    passwordInput.addEventListener("input", function () {
-      const value = passwordInput.value;
-
-      document.getElementById("rule-length").style.color =
-        value.length >= 8 ? "green" : "red";
-
-      document.getElementById("rule-upper").style.color =
-        /[A-Z]/.test(value) ? "green" : "red";
-
-      document.getElementById("rule-lower").style.color =
-        /[a-z]/.test(value) ? "green" : "red";
-
-      document.getElementById("rule-number").style.color =
-        /\d/.test(value) ? "green" : "red";
-    });
-  }
-
-  /* =========================
-     Form submit — REAL BACKEND
-  ========================== */
-  const signupForm = document.getElementById("signupForm");
-
-  if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-
-      // Basic checks
-      if (!firstName || !lastName || !email) {
-        alert("Please fill in first name, last name and email.");
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
-
-      // Strong password check
-      if (!isStrongPassword(password)) {
-        alert(
-          "Password must be at least 8 characters long and include:\n" +
-          "• Uppercase letter\n" +
-          "• Lowercase letter\n" +
-          "• Number"
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener("click", () => {
+        mobileMenu.classList.toggle("open");
+        hamburger.setAttribute(
+          "aria-expanded",
+          mobileMenu.classList.contains("open")
         );
-        return;
-      }
+      });
 
-      const submitBtn = signupForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
+      document.addEventListener("click", (e) => {
+        if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+          mobileMenu.classList.remove("open");
+        }
+      });
+    }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Creating account...";
+    /* =========================
+       Password toggle icons
+    ========================== */
+    document.querySelectorAll(".toggle-password").forEach((icon) => {
+      icon.addEventListener("click", function () {
+        const input = document.getElementById(this.dataset.target);
+        if (!input) return;
 
-      try {
-        const response = await fetch("/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firstname: firstName,
-            lastname: lastName,
-            email: email,
-            password: password,
-          }),
-        });
+        const isHidden = input.type === "password";
+        input.type = isHidden ? "text" : "password";
 
-        let data = null;
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
+      });
+    });
+
+    /* =========================
+       Strong password checker
+    ========================== */
+    function isStrongPassword(password) {
+      // At least 8 chars, 1 uppercase, 1 lowercase, 1 digit
+      const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+      return strongRegex.test(password);
+    }
+
+    const passwordInput = document.getElementById("password");
+    if (passwordInput) {
+      passwordInput.addEventListener("input", function () {
+        const value = passwordInput.value;
+
+        document.getElementById("rule-length").style.color =
+          value.length >= 8 ? "green" : "red";
+
+        document.getElementById("rule-upper").style.color =
+          /[A-Z]/.test(value) ? "green" : "red";
+
+        document.getElementById("rule-lower").style.color =
+          /[a-z]/.test(value) ? "green" : "red";
+
+        document.getElementById("rule-number").style.color =
+          /\d/.test(value) ? "green" : "red";
+      });
+    }
+
+    /* =========================
+       Form submit — REAL BACKEND
+    ========================== */
+    const signupForm = document.getElementById("signupForm");
+
+    if (signupForm) {
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        // Basic checks
+        if (!firstName || !lastName || !email) {
+          alert("Please fill in first name, last name and email.");
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          alert("Passwords do not match.");
+          return;
+        }
+
+        // Strong password check
+        if (!isStrongPassword(password)) {
+          alert(
+            "Password must be at least 8 characters long and include:\n" +
+            "• Uppercase letter\n" +
+            "• Lowercase letter\n" +
+            "• Number"
+          );
+          return;
+        }
+
+        const submitBtn = signupForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Creating account...";
+
         try {
-          // read body ONLY ONCE
-          data = await response.json();
-        } catch (err) {
-          console.error("Response is not valid JSON", err);
-        }
+          const response = await fetch("/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              firstname: firstName,
+              lastname: lastName,
+              email: email,
+              password: password,
+            }),
+          });
 
-        if (!response.ok) {
-          const msg =
-            (data && (data.detail || data.message)) ||
-            "Signup failed (server error).";
-          alert(msg);
-          return;
-        }
-
-        if (!data || !data.ok) {
-          alert((data && data.message) || "Signup failed.");
-          return;
-        }
-
-        alert("Account created successfully ✅");
-
-        // Reset form
-        signupForm.reset();
-
-        // Reset password rules colors to red
-        ["rule-length", "rule-upper", "rule-lower", "rule-number"].forEach(
-          (id) => {
-            const el = document.getElementById(id);
-            if (el) el.style.color = "red";
+          let data = null;
+          try {
+            // read body ONLY ONCE
+            data = await response.json();
+          } catch (err) {
+            console.error("Response is not valid JSON", err);
           }
-        );
 
-        // Redirect to login page
-        window.location.href = "/login";
-      } catch (err) {
-        console.error(err);
-        alert("Something went wrong. Try again.");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      }
-    });
-  }
-</script>
+          if (!response.ok) {
+            const msg =
+              (data && (data.detail || data.message)) ||
+              "Signup failed (server error).";
+            alert(msg);
+            return;
+          }
+
+          if (!data || !data.ok) {
+            alert((data && data.message) || "Signup failed.");
+            return;
+          }
+
+          alert("Account created successfully ✅");
+
+          // Reset form
+          signupForm.reset();
+
+          // Reset password rules colors to red
+          ["rule-length", "rule-upper", "rule-lower", "rule-number"].forEach(
+            (id) => {
+              const el = document.getElementById(id);
+              if (el) el.style.color = "red";
+            }
+          );
+
+          // Redirect to login page
+          window.location.href = "/login";
+        } catch (err) {
+          console.error(err);
+          alert("Something went wrong. Try again.");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      });
+    }
+  </script>
 
 
 
 
 </body>
+
 </html>

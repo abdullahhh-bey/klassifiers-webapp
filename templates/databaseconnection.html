@@ -1,327 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Klassifiers — Database Connection</title>
 
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    :root{
+    :root {
       --primary: #002568;
       --bg: #f4f6fb;
       --muted: #777;
       --header-border: #e9edf2;
       --black: #0b1220;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
       font-family: Inter, Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--primary);
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      flex-direction:column;
+      background: var(--bg);
+      color: var(--primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ---------- SLIM HEADER ---------- */
     .site-header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px 20px;
-      background:#fff;
-      border-bottom:1px solid var(--header-border);
-      position:sticky;
-      top:0;
-      z-index:80;
-      height:64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--header-border);
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      height: 64px;
     }
 
     .brand {
-      display:flex;
-      align-items:center;
-      gap:12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .brand img{ width:28px; height:28px; object-fit:contain; }
-    .brand .title{ font-weight:700; font-size:18px; color:var(--black); letter-spacing:0.2px; }
+    .brand img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .brand .title {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--black);
+      letter-spacing: 0.2px;
+    }
 
     /* Right nav */
     .nav {
-      display:flex;
-      align-items:center;
-      gap:22px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
     }
 
-    .nav a.link{
-      color:var(--black);
-      text-decoration:none;
-      font-size:15px;
-      font-weight:600;
+    .nav a.link {
+      color: var(--black);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
     }
 
-    .nav .signin{
-      padding:8px 12px;
-      border-radius:8px;
-      border:1px solid #d0d6db;
-      background:transparent;
-      color:var(--black);
-      font-weight:700;
-      text-decoration:none;
-      font-size:14px;
+    .nav .signin {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d0d6db;
+      background: transparent;
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
     }
 
-    .nav .get-started{
-      color:var(--black);
-      font-weight:700;
-      text-decoration:none;
-      font-size:15px;
+    .nav .get-started {
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 15px;
     }
 
     .nav .cta {
-      padding:8px 14px;
-      border-radius:8px;
-      background:var(--primary);
-      color:#fff !important;
-      text-decoration:none;
-      font-weight:700;
-      font-size:14px;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.08);
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.08);
     }
 
     .hamburger {
-      display:none;
-      width:40px;
-      height:40px;
-      border-radius:8px;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      background:transparent;
-      border:1px solid transparent;
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
     }
 
-    .hamburger .bar{ font-size:18px; color:var(--black); }
+    .hamburger .bar {
+      font-size: 18px;
+      color: var(--black);
+    }
 
     .mobile-menu {
-      position:absolute;
-      right:12px;
-      top:64px;
-      background:#fff;
-      border:1px solid #e6ecf2;
-      border-radius:10px;
-      box-shadow:0 8px 28px rgba(10,20,40,0.08);
-      width:200px;
-      display:none;
-      flex-direction:column;
-      padding:8px 6px;
-      z-index:90;
+      position: absolute;
+      right: 12px;
+      top: 64px;
+      background: #fff;
+      border: 1px solid #e6ecf2;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10, 20, 40, 0.08);
+      width: 200px;
+      display: none;
+      flex-direction: column;
+      padding: 8px 6px;
+      z-index: 90;
     }
-    .mobile-menu.open{ display:flex; }
 
-    .mobile-menu a{
-      display:block;
-      padding:10px 12px;
-      color:var(--black);
-      text-decoration:none;
-      font-weight:600;
-      border-radius:8px;
-      margin:4px;
+    .mobile-menu.open {
+      display: flex;
     }
-    .mobile-menu a:hover{ background:#f6f9fc; }
+
+    .mobile-menu a {
+      display: block;
+      padding: 10px 12px;
+      color: var(--black);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      margin: 4px;
+    }
+
+    .mobile-menu a:hover {
+      background: #f6f9fc;
+    }
 
     /* ---------- Page & Form ---------- */
-    .page-wrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 16px;
-      flex:1 0 auto;
+    .page-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+      flex: 1 0 auto;
     }
 
     .container {
-      width:420px;
-      max-width:92%;
-      background:#fff;
-      padding:28px;
-      border-radius:12px;
-      border:1px solid #eef3f8;
-      box-shadow: 0 8px 25px rgba(0,37,104,0.12);
+      width: 420px;
+      max-width: 92%;
+      background: #fff;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #eef3f8;
+      box-shadow: 0 8px 25px rgba(0, 37, 104, 0.12);
     }
 
-    h2{
-      text-align:center;
-      margin:0 0 8px 0;
-      color:var(--primary);
-      font-size:22px;
+    h2 {
+      text-align: center;
+      margin: 0 0 8px 0;
+      color: var(--primary);
+      font-size: 22px;
     }
 
-    p.lead{
-      text-align:center;
-      color:var(--muted);
-      margin:4px 0 18px 0;
-      font-size:14px;
+    p.lead {
+      text-align: center;
+      color: var(--muted);
+      margin: 4px 0 18px 0;
+      font-size: 14px;
     }
 
-    label{
-      display:block;
-      font-weight:700;
-      margin-bottom:8px;
-      color:var(--primary);
-      font-size:13px;
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: 13px;
     }
 
-    .form-group{ margin-bottom:16px; }
+    .form-group {
+      margin-bottom: 16px;
+    }
 
-    .input-with-icon{ position:relative; width:100%; }
+    .input-with-icon {
+      position: relative;
+      width: 100%;
+    }
 
-    .icon-left{
-      position:absolute;
-      left:12px;
-      top:50%;
-      transform:translateY(-50%);
-      color:var(--muted);
-      pointer-events:none;
+    .icon-left {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
     }
 
     input.form-control,
-    select.form-control{
-      width:100%;
-      padding:12px 42px;
-      border-radius:10px;
-      border:1px solid #dde6ef;
-      background:#fbfdff;
-      font-size:14px;
-      color:var(--primary);
-      -webkit-appearance:none;
-      -moz-appearance:none;
-      appearance:none;
+    select.form-control {
+      width: 100%;
+      padding: 12px 42px;
+      border-radius: 10px;
+      border: 1px solid #dde6ef;
+      background: #fbfdff;
+      font-size: 14px;
+      color: var(--primary);
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
     }
 
-    select.form-control{
-      cursor:pointer;
+    select.form-control {
+      cursor: pointer;
     }
 
     input.form-control:focus,
-    select.form-control:focus{
-      outline:none;
-      box-shadow:0 0 8px rgba(0,37,104,0.12);
-      border-color:var(--primary);
-      background:#fff;
+    select.form-control:focus {
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 37, 104, 0.12);
+      border-color: var(--primary);
+      background: #fff;
     }
 
     /* invalid field highlight */
-    .form-control.invalid{
-      border-color:#e34949;
-      box-shadow:0 0 0 1px rgba(227,73,73,0.2);
+    .form-control.invalid {
+      border-color: #e34949;
+      box-shadow: 0 0 0 1px rgba(227, 73, 73, 0.2);
     }
 
-    .toggle-password{
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      cursor:pointer;
-      color:var(--primary);
-      font-size:16px;
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 16px;
     }
 
-    .hint-text{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:4px;
+    .hint-text {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
     }
 
-    .button-row{
-      display:flex;
-      gap:10px;
-      margin-top:8px;
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
     }
 
-    .button-row button{
-      flex:1;
-      padding:12px;
-      border-radius:10px;
-      font-weight:700;
-      font-size:15px;
-      cursor:pointer;
-      border:none;
+    .button-row button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      border: none;
     }
 
-    .button-primary{
-      background:var(--primary);
-      color:#fff;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.12);
+    .button-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.12);
       transition: background-color 1s, color 1s;
     }
 
-    .button-secondary{
-      background:#fff;
-      color:var(--primary);
-      border:1px solid #dde6ef;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.12);i
+    .button-secondary {
+      background: #fff;
+      color: var(--primary);
+      border: 1px solid #dde6ef;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.12);
       transition: background-color 1s, color 1s;
     }
 
-    .button-primary:hover{
-      background:#fff;
-      color:var(--primary);
+    .button-primary:hover {
+      background: #fff;
+      color: var(--primary);
     }
 
-    .button-secondary:hover{
-      background:var(--primary);
-      color:#fff;
-     }
+    .button-secondary:hover {
+      background: var(--primary);
+      color: #fff;
+    }
 
     .button-secondary:disabled,
-    .button-primary:disabled{
-      opacity:0.7;
-      cursor:not-allowed;
-      box-shadow:none;
+    .button-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
-    .error{
-      color:#e34949;
-      font-size:13px;
-      margin-top:6px;
-      display:none;
+    .error {
+      color: #e34949;
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
     }
 
-    .footer{
-      text-align:center;
-      padding:14px 12px;
-      font-size:14px;
-      color:var(--black);
-      opacity:0.7;
-      border-top:1px solid #eef2f6;
-      flex-shrink:0;
+    .footer {
+      text-align: center;
+      padding: 14px 12px;
+      font-size: 14px;
+      color: var(--black);
+      opacity: 0.7;
+      border-top: 1px solid #eef2f6;
+      flex-shrink: 0;
     }
 
-    @media (max-width:720px){
+    @media (max-width:720px) {
+
       .nav a.link,
-      .nav .get-started { display:none; }
-      .hamburger { display:flex; }
-      .nav .signin{
-        display:inline-flex;
-        padding:6px 10px;
-        font-size:13px;
+      .nav .get-started {
+        display: none;
       }
-      .mobile-menu{
-        right:8px;
-        left:8px;
-        width:auto;
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav .signin {
+        display: inline-flex;
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .mobile-menu {
+        right: 8px;
+        left: 8px;
+        width: auto;
       }
     }
 
-    @media (max-width:420px){
-      .site-header{ padding:10px 12px; }
-      .brand .title{ font-size:16px; }
+    @media (max-width:420px) {
+      .site-header {
+        padding: 10px 12px;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -335,19 +376,22 @@
       <div class="title">Klassifiers</div>
     </div>
 
-    <nav class="nav">
-      <a class="link hide-sm" href="#">Home</a>
-      <a class="link hide-sm" href="#">Pricing</a>
-      <a class="signin" href="/login">Sign In</a>
-      <a class="get-started" href="/signup">Get Started</a>
+    <div class="nav" id="nav-menu">
+      <a href="/" class="link">Home</a>
+      <a href="#features" class="link">Features</a>
+      <a href="#pricing" class="link">Pricing</a>
+      <a href="/database-connection" class="link">Connect DB</a>
+      <a href="/chat" class="link">Chat</a>
+      <a href="/login" class="link signin" id="nav-signin">Sign In</a>
+      <a href="/signup" class="get-started" id="nav-signup">Get Started</a>
 
       <button class="hamburger" id="hamburger" aria-expanded="false">
         <span class="bar"><i class="fas fa-bars"></i></span>
       </button>
-    </nav>
+    </div>
 
     <div class="mobile-menu" id="mobile-menu">
-      <a href="#">Home</a>
+      <a href="/">Home</a>
       <a href="#">Pricing</a>
       <a href="/login">Sign In</a>
       <a class="cta" href="/signup">Get Started</a>
@@ -381,8 +425,8 @@
           <label for="host">Host</label>
           <div class="input-with-icon">
             <i class="fas fa-server icon-left"></i>
-            <input id="host" class="form-control" type="text"
-                   placeholder="e.g. localhost, 127.0.0.1, db.example.com" required>
+            <input id="host" class="form-control" type="text" placeholder="e.g. localhost, 127.0.0.1, db.example.com"
+              required>
           </div>
           <div class="error" id="hostError">
             Please enter a valid host (localhost, IP, or domain).
@@ -394,8 +438,7 @@
           <label for="port">Port</label>
           <div class="input-with-icon">
             <i class="fas fa-plug icon-left"></i>
-            <input id="port" class="form-control" type="number"
-                   placeholder="e.g. 5432" required>
+            <input id="port" class="form-control" type="number" placeholder="e.g. 5432" required>
           </div>
           <div class="hint-text">Common ports: PostgreSQL 5432, MySQL 3306, ClickHouse 9000.</div>
           <div class="error" id="portError">
@@ -408,8 +451,7 @@
           <label for="dbName">Database Name</label>
           <div class="input-with-icon">
             <i class="fas fa-layer-group icon-left"></i>
-            <input id="dbName" class="form-control" type="text"
-                   placeholder="Enter database name" required>
+            <input id="dbName" class="form-control" type="text" placeholder="Enter database name" required>
           </div>
           <div class="error" id="dbNameError">Database name is required.</div>
         </div>
@@ -419,8 +461,7 @@
           <label for="username">Username</label>
           <div class="input-with-icon">
             <i class="fas fa-user icon-left"></i>
-            <input id="username" class="form-control" type="text"
-                   placeholder="Enter database username" required>
+            <input id="username" class="form-control" type="text" placeholder="Enter database username" required>
           </div>
           <div class="error" id="usernameError">Username is required.</div>
         </div>
@@ -430,8 +471,7 @@
           <label for="password">Password</label>
           <div class="input-with-icon">
             <i class="fas fa-lock icon-left"></i>
-            <input id="password" class="form-control" type="password"
-                   placeholder="Enter database password" required>
+            <input id="password" class="form-control" type="password" placeholder="Enter database password" required>
             <i class="fas fa-eye toggle-password" data-target="password" title="Show/Hide"></i>
           </div>
           <div class="error" id="passwordError">Password is required.</div>
@@ -456,253 +496,257 @@
   </footer>
 
   <!-- SAME HTML & CSS AS YOU PROVIDED -->
-<!-- ONLY SCRIPT SECTION IS UPDATED BELOW -->
+  <!-- ONLY SCRIPT SECTION IS UPDATED BELOW -->
 
   <script>
-  /* =========================
-     Mobile menu
-  ========================== */
-  const hamburger = document.getElementById("hamburger");
-  const mobileMenu = document.getElementById("mobile-menu");
+    /* =========================
+       Mobile menu
+    ========================== */
+    const hamburger = document.getElementById("hamburger");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-  if (hamburger && mobileMenu) {
-    hamburger.addEventListener("click", () => {
-      mobileMenu.classList.toggle("open");
-      hamburger.setAttribute(
-        "aria-expanded",
-        mobileMenu.classList.contains("open")
-      );
-    });
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener("click", () => {
+        mobileMenu.classList.toggle("open");
+        hamburger.setAttribute(
+          "aria-expanded",
+          mobileMenu.classList.contains("open")
+        );
+      });
 
-    document.addEventListener("click", (e) => {
-      if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
-        mobileMenu.classList.remove("open");
-      }
-    });
-  }
-
-  /* =========================
-     Password toggle
-  ========================== */
-  document.querySelectorAll(".toggle-password").forEach((icon) => {
-    icon.addEventListener("click", function () {
-      const input = document.getElementById(this.dataset.target);
-      if (!input) return;
-
-      input.type = input.type === "password" ? "text" : "password";
-      this.classList.toggle("fa-eye");
-      this.classList.toggle("fa-eye-slash");
-    });
-  });
-
-  /* =========================
-     Validation helpers
-  ========================== */
-  function setFieldError(fieldId, errorId, hasError, message) {
-    const field = document.getElementById(fieldId);
-    const errorEl = document.getElementById(errorId);
-
-    if (!field) return !hasError;
-
-    if (hasError) {
-      field.classList.add("invalid");
-      if (errorEl) {
-        errorEl.style.display = "block";
-        if (message) errorEl.textContent = message;
-      }
-    } else {
-      field.classList.remove("invalid");
-      if (errorEl) {
-        errorEl.style.display = "none";
-      }
-    }
-    return !hasError;
-  }
-
-  function validateForm() {
-    let ok = true;
-
-    const dbType = document.getElementById("dbType").value.trim();
-    const host = document.getElementById("host").value.trim();
-    const port = document.getElementById("port").value.trim();
-    const dbName = document.getElementById("dbName").value.trim();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-
-    // Database type
-    ok =
-      setFieldError(
-        "dbType",
-        "dbTypeError",
-        dbType === "",
-        "Please select a database type."
-      ) && ok;
-
-    // Host validation
-    const hostRegex =
-      /^(localhost|(\d{1,3}\.){3}\d{1,3}|(([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}))$/;
-    const invalidHost = host === "" || !hostRegex.test(host);
-
-    ok =
-      setFieldError(
-        "host",
-        "hostError",
-        invalidHost,
-        "Please enter a valid host (localhost, IP, or domain)."
-      ) && ok;
-
-    // Port validation
-    const portNum = Number(port);
-    const invalidPort =
-      !port || Number.isNaN(portNum) || portNum < 1 || portNum > 65535;
-
-    ok =
-      setFieldError(
-        "port",
-        "portError",
-        invalidPort,
-        "Port must be a number between 1 and 65535."
-      ) && ok;
-
-    // DB name
-    ok =
-      setFieldError(
-        "dbName",
-        "dbNameError",
-        dbName === "",
-        "Database name is required."
-      ) && ok;
-
-    // Username
-    ok =
-      setFieldError(
-        "username",
-        "usernameError",
-        username === "",
-        "Username is required."
-      ) && ok;
-
-    // Password
-    ok =
-      setFieldError(
-        "password",
-        "passwordError",
-        password.trim() === "",
-        "Password is required."
-      ) && ok;
-
-    if (!ok) {
-      const firstInvalid = document.querySelector(".form-control.invalid");
-      if (firstInvalid) firstInvalid.focus();
+      document.addEventListener("click", (e) => {
+        if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+          mobileMenu.classList.remove("open");
+        }
+      });
     }
 
-    return ok;
-  }
+    /* =========================
+       Password toggle
+    ========================== */
+    document.querySelectorAll(".toggle-password").forEach((icon) => {
+      icon.addEventListener("click", function () {
+        const input = document.getElementById(this.dataset.target);
+        if (!input) return;
 
-  /* =========================
-     Cache elements (FIX)
-  ========================== */
-  const form = document.getElementById("dbForm");
-  const testBtn = document.getElementById("testConnection");
-  const saveBtn = document.getElementById("saveConnection");
-
-  const dbTypeEl = document.getElementById("dbType");
-  const hostEl = document.getElementById("host");
-  const portEl = document.getElementById("port");
-  const dbNameEl = document.getElementById("dbName");
-  const usernameEl = document.getElementById("username");
-  const passwordEl = document.getElementById("password");
-
-  /* =========================
-     Test Connection (demo)
-  ========================== */
-  if (testBtn && form) {
-    testBtn.addEventListener("click", () => {
-      if (!validateForm()) {
-        alert("Please fix the highlighted fields before testing.");
-        return;
-      }
-
-      testBtn.disabled = true;
-      saveBtn.disabled = true;
-      const originalText = testBtn.textContent;
-      testBtn.textContent = "Testing...";
-
-      setTimeout(() => {
-        alert("Connection successful (demo) ✅");
-        testBtn.disabled = false;
-        saveBtn.disabled = false;
-        testBtn.textContent = originalText;
-      }, 700);
+        input.type = input.type === "password" ? "text" : "password";
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
+      });
     });
-  }
 
-  /* =========================
-     Save Connection (backend)
-  ========================== */
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    /* =========================
+       Validation helpers
+    ========================== */
+    function setFieldError(fieldId, errorId, hasError, message) {
+      const field = document.getElementById(fieldId);
+      const errorEl = document.getElementById(errorId);
 
-      if (!validateForm()) {
-        alert("Please fix the highlighted fields before saving.");
-        return;
+      if (!field) return !hasError;
+
+      if (hasError) {
+        field.classList.add("invalid");
+        if (errorEl) {
+          errorEl.style.display = "block";
+          if (message) errorEl.textContent = message;
+        }
+      } else {
+        field.classList.remove("invalid");
+        if (errorEl) {
+          errorEl.style.display = "none";
+        }
+      }
+      return !hasError;
+    }
+
+    function validateForm() {
+      let ok = true;
+
+      const dbType = document.getElementById("dbType").value.trim();
+      const host = document.getElementById("host").value.trim();
+      const port = document.getElementById("port").value.trim();
+      const dbName = document.getElementById("dbName").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      // Database type
+      ok =
+        setFieldError(
+          "dbType",
+          "dbTypeError",
+          dbType === "",
+          "Please select a database type."
+        ) && ok;
+
+      // Host validation
+      const hostRegex =
+        /^(localhost|(\d{1,3}\.){3}\d{1,3}|(([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}))$/;
+      const invalidHost = host === "" || !hostRegex.test(host);
+
+      ok =
+        setFieldError(
+          "host",
+          "hostError",
+          invalidHost,
+          "Please enter a valid host (localhost, IP, or domain)."
+        ) && ok;
+
+      // Port validation
+      const portNum = Number(port);
+      const invalidPort =
+        !port || Number.isNaN(portNum) || portNum < 1 || portNum > 65535;
+
+      ok =
+        setFieldError(
+          "port",
+          "portError",
+          invalidPort,
+          "Port must be a number between 1 and 65535."
+        ) && ok;
+
+      // DB name
+      ok =
+        setFieldError(
+          "dbName",
+          "dbNameError",
+          dbName === "",
+          "Database name is required."
+        ) && ok;
+
+      // Username
+      ok =
+        setFieldError(
+          "username",
+          "usernameError",
+          username === "",
+          "Username is required."
+        ) && ok;
+
+      // Password
+      ok =
+        setFieldError(
+          "password",
+          "passwordError",
+          password.trim() === "",
+          "Password is required."
+        ) && ok;
+
+      if (!ok) {
+        const firstInvalid = document.querySelector(".form-control.invalid");
+        if (firstInvalid) firstInvalid.focus();
       }
 
-      // ✅ ADD THIS PART (AUTH CHECK)
-      const userId = Number(localStorage.getItem("user_id"));
+      return ok;
+    }
 
-      if (!userId) {
-        alert("User not logged in. Please login again.");
-        return;
-      }
+    /* =========================
+       Cache elements (FIX)
+    ========================== */
+    const form = document.getElementById("dbForm");
+    const testBtn = document.getElementById("testConnection");
+    const saveBtn = document.getElementById("saveConnection");
 
-      // ✅ THEN CREATE PAYLOAD
-      const payload = {
-        user_id: userId,
-        db_type: dbTypeEl.value.trim(),
-        host: hostEl.value.trim(),
-        port: Number(portEl.value),
-        db_name: dbNameEl.value.trim(),
-        username: usernameEl.value.trim(),
-        password: passwordEl.value
-      };
+    const dbTypeEl = document.getElementById("dbType");
+    const hostEl = document.getElementById("host");
+    const portEl = document.getElementById("port");
+    const dbNameEl = document.getElementById("dbName");
+    const usernameEl = document.getElementById("username");
+    const passwordEl = document.getElementById("password");
 
-
-      saveBtn.disabled = true;
-      testBtn.disabled = true;
-      const originalText = saveBtn.textContent;
-      saveBtn.textContent = "Saving...";
-
-      try {
-        const res = await fetch("/api/database-connection", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.ok) {
-          throw new Error(data.detail || data.message || "Failed to save");
+    /* =========================
+       Test Connection (demo)
+    ========================== */
+    if (testBtn && form) {
+      testBtn.addEventListener("click", () => {
+        if (!validateForm()) {
+          alert("Please fix the highlighted fields before testing.");
+          return;
         }
 
-        alert("Database connection saved successfully ✅");
-        form.reset();
+        testBtn.disabled = true;
+        saveBtn.disabled = true;
+        const originalText = testBtn.textContent;
+        testBtn.textContent = "Testing...";
 
-      } catch (err) {
-        alert("Error: " + err.message);
-      } finally {
-        saveBtn.disabled = false;
-        testBtn.disabled = false;
-        saveBtn.textContent = originalText;
-      }
-    });
-  }
+        setTimeout(() => {
+          alert("Connection successful (demo) ✅");
+          testBtn.disabled = false;
+          saveBtn.disabled = false;
+          testBtn.textContent = originalText;
+        }, 700);
+      });
+    }
+
+    /* =========================
+       Save Connection (backend)
+    ========================== */
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+          alert("Please fix the highlighted fields before saving.");
+          return;
+        }
+
+        // ✅ ADD THIS PART (AUTH CHECK)
+        const userId = Number(localStorage.getItem("user_id"));
+
+        if (!userId) {
+          alert("User not logged in. Please login again.");
+          return;
+        }
+
+        // ✅ THEN CREATE PAYLOAD
+        const payload = {
+          user_id: userId,
+          db_type: dbTypeEl.value.trim(),
+          host: hostEl.value.trim(),
+          port: Number(portEl.value),
+          db_name: dbNameEl.value.trim(),
+          username: usernameEl.value.trim(),
+          password: passwordEl.value
+        };
+
+
+        saveBtn.disabled = true;
+        testBtn.disabled = true;
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = "Saving...";
+
+        try {
+          const res = await fetch("/api/database-connection", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+
+          if (!res.ok || !data.ok) {
+            throw new Error(data.detail || data.message || "Failed to save");
+          }
+
+          alert("Database connection saved successfully ✅");
+          form.reset();
+
+          // Redirect to Chat page
+          window.location.href = "/chat";
+
+        } catch (err) {
+          alert("Error: " + err.message);
+        } finally {
+          saveBtn.disabled = false;
+          testBtn.disabled = false;
+          saveBtn.textContent = originalText;
+        }
+      });
+    }
   </script>
 
 
 
 
 </body>
+
 </html>

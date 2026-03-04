@@ -1,288 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Klassifiers — Sign In</title>
 
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    :root{
+    :root {
       --primary: #002568;
       --bg: #f4f6fb;
       --muted: #777;
       --header-border: #e9edf2;
       --black: #0b1220;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
       font-family: Inter, Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--primary);
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      flex-direction:column;
+      background: var(--bg);
+      color: var(--primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ---------- SLIM HEADER ---------- */
     .site-header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px 20px;
-      background:#fff;
-      border-bottom:1px solid var(--header-border);
-      position:sticky;
-      top:0;
-      z-index:80;
-      height:64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--header-border);
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      height: 64px;
     }
 
     .brand {
-      display:flex;
-      align-items:center;
-      gap:12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .brand img{ width:28px; height:28px; object-fit:contain; }
-    .brand .title{ font-weight:700; font-size:18px; color:var(--black); letter-spacing:0.2px; }
+    .brand img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .brand .title {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--black);
+      letter-spacing: 0.2px;
+    }
 
     /* Right nav */
     .nav {
-      display:flex;
-      align-items:center;
-      gap:22px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
     }
 
-    .nav a.link{
-      color:var(--black);
-      text-decoration:none;
-      font-size:15px;
-      font-weight:600;
+    .nav a.link {
+      color: var(--black);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
     }
 
-    .nav .signin{
-      padding:8px 12px;
-      border-radius:8px;
-      border:1px solid #d0d6db;
-      background:transparent;
-      color:var(--black);
-      font-weight:700;
-      text-decoration:none;
-      font-size:14px;
+    .nav .signin {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d0d6db;
+      background: transparent;
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
     }
 
-    .nav .get-started{
-      color:var(--black);
-      font-weight:700;
-      text-decoration:none;
-      font-size:15px;
+    .nav .get-started {
+      color: var(--black);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 15px;
     }
 
     /* CTA */
     .nav .cta {
-      padding:8px 14px;
-      border-radius:8px;
-      background:var(--primary);
-      color:#fff !important;
-      text-decoration:none;
-      font-weight:700;
-      font-size:14px;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.08);
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.08);
     }
 
     /* Hamburger */
     .hamburger {
-      display:none;
-      width:40px;
-      height:40px;
-      border-radius:8px;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      background:transparent;
-      border:1px solid transparent;
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
     }
 
-    .hamburger .bar{ font-size:18px; color:var(--black); }
+    .hamburger .bar {
+      font-size: 18px;
+      color: var(--black);
+    }
 
     /* Mobile menu */
     .mobile-menu {
-      position:absolute;
-      right:12px;
-      top:64px;
-      background:#fff;
-      border:1px solid #e6ecf2;
-      border-radius:10px;
-      box-shadow:0 8px 28px rgba(10,20,40,0.08);
-      width:200px;
-      display:none;
-      flex-direction:column;
-      padding:8px 6px;
-      z-index:90;
+      position: absolute;
+      right: 12px;
+      top: 64px;
+      background: #fff;
+      border: 1px solid #e6ecf2;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10, 20, 40, 0.08);
+      width: 200px;
+      display: none;
+      flex-direction: column;
+      padding: 8px 6px;
+      z-index: 90;
     }
-    .mobile-menu.open{ display:flex; }
 
-    .mobile-menu a{
-      display:block;
-      padding:10px 12px;
-      color:var(--black);
-      text-decoration:none;
-      font-weight:600;
-      border-radius:8px;
-      margin:4px;
+    .mobile-menu.open {
+      display: flex;
     }
-    .mobile-menu a:hover{ background:#f6f9fc; }
+
+    .mobile-menu a {
+      display: block;
+      padding: 10px 12px;
+      color: var(--black);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      margin: 4px;
+    }
+
+    .mobile-menu a:hover {
+      background: #f6f9fc;
+    }
 
     /* ---------- Page & Form ---------- */
-    .page-wrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 16px;
-      flex:1 0 auto;
+    .page-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+      flex: 1 0 auto;
     }
 
     .container {
-      width:380px;
-      max-width:92%;
-      background:#fff;
-      padding:28px;
-      border-radius:12px;
-      border:1px solid #eef3f8;
-      box-shadow: 0 8px 25px rgba(0,37,104,0.12);
+      width: 380px;
+      max-width: 92%;
+      background: #fff;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #eef3f8;
+      box-shadow: 0 8px 25px rgba(0, 37, 104, 0.12);
     }
 
-    h2{
-      text-align:center;
-      margin:0 0 18px 0;
-      color:var(--primary);
-      font-size:22px;
+    h2 {
+      text-align: center;
+      margin: 0 0 18px 0;
+      color: var(--primary);
+      font-size: 22px;
     }
 
-    p.lead{
-      text-align:center;
-      color:var(--muted);
-      margin:8px 0 18px 0;
-      font-size:14px;
+    p.lead {
+      text-align: center;
+      color: var(--muted);
+      margin: 8px 0 18px 0;
+      font-size: 14px;
     }
 
-    label{
-      display:block;
-      font-weight:700;
-      margin-bottom:8px;
-      color:var(--primary);
-      font-size:13px;
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: 13px;
     }
 
-    .form-group{ margin-bottom:16px; }
-
-    .input-with-icon{ position:relative; width:100%; }
-
-    .icon-left{
-      position:absolute;
-      left:12px;
-      top:50%;
-      transform:translateY(-50%);
-      color:var(--muted);
-      pointer-events:none;
+    .form-group {
+      margin-bottom: 16px;
     }
 
-    input.form-control{
-      width:100%;
-      padding:12px 42px;
-      border-radius:10px;
-      border:1px solid #dde6ef;
-      background:#fbfdff;
-      font-size:14px;
-      color:var(--primary);
-      box-sizing:border-box;
+    .input-with-icon {
+      position: relative;
+      width: 100%;
     }
 
-    input.form-control:focus{
-      outline:none;
-      box-shadow:0 0 8px rgba(0,37,104,0.12);
-      border-color:var(--primary);
-      background:#fff;
+    .icon-left {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
     }
 
-    .toggle-password{
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      cursor:pointer;
-      color:var(--primary);
-      font-size:16px;
+    input.form-control {
+      width: 100%;
+      padding: 12px 42px;
+      border-radius: 10px;
+      border: 1px solid #dde6ef;
+      background: #fbfdff;
+      font-size: 14px;
+      color: var(--primary);
+      box-sizing: border-box;
     }
 
-    .help-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-top:6px;
-      font-size:13px;
+    input.form-control:focus {
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 37, 104, 0.12);
+      border-color: var(--primary);
+      background: #fff;
     }
 
-    .help-row a{ color:var(--primary); text-decoration:none; font-weight:600; }
-
-    button[type="submit"]{
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      background:var(--primary);
-      color:#fff;
-      border:none;
-      font-weight:700;
-      font-size:15px;
-      box-shadow: 0 6px 14px rgba(0,37,104,0.12);
-      margin-top:12px;
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 16px;
     }
 
-    .signup-link{
-      text-align:center;
-      margin-top:14px;
-      font-size:14px;
-      color:var(--primary);
+    .help-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 13px;
     }
-    .signup-link a{ font-weight:700; color:var(--primary); text-decoration:none; margin-left:6px; }
+
+    .help-row a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      font-size: 15px;
+      box-shadow: 0 6px 14px rgba(0, 37, 104, 0.12);
+      margin-top: 12px;
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--primary);
+    }
+
+    .signup-link a {
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      margin-left: 6px;
+    }
 
     /* Footer */
-    .footer{
-      text-align:center;
-      padding:14px 12px;
-      font-size:14px;
-      color:var(--black);
-      opacity:0.7;
-      border-top:1px solid #eef2f6;
-      flex-shrink:0;
+    .footer {
+      text-align: center;
+      padding: 14px 12px;
+      font-size: 14px;
+      color: var(--black);
+      opacity: 0.7;
+      border-top: 1px solid #eef2f6;
+      flex-shrink: 0;
     }
 
     /* Responsive */
-    @media (max-width:720px){
+    @media (max-width:720px) {
+
       .nav a.link,
-      .nav .get-started { display:none; }
-      .hamburger { display:flex; }
-      .nav .signin{
-        display:inline-flex;
-        padding:6px 10px;
-        font-size:13px;
+      .nav .get-started {
+        display: none;
       }
-      .mobile-menu{
-        right:8px;
-        left:8px;
-        width:auto;
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav .signin {
+        display: inline-flex;
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .mobile-menu {
+        right: 8px;
+        left: 8px;
+        width: auto;
       }
     }
 
-    @media (max-width:420px){
-      .site-header{ padding:10px 12px; }
-      .brand .title{ font-size:16px; }
+    @media (max-width:420px) {
+      .site-header {
+        padding: 10px 12px;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -297,10 +348,10 @@
     </div>
 
     <nav class="nav">
-      <a class="link hide-sm" href="#">Home</a>
+      <a class="link hide-sm" href="/">Home</a>
       <a class="link hide-sm" href="#">Pricing</a>
-      <a class="signin" href="#">Sign In</a>
-      <a class="get-started" href="#">Get Started</a>
+      <a class="signin" href="/login">Sign In</a>
+      <a class="get-started" href="/signup">Get Started</a>
 
       <button class="hamburger" id="hamburger" aria-expanded="false">
         <span class="bar"><i class="fas fa-bars"></i></span>
@@ -308,10 +359,10 @@
     </nav>
 
     <div class="mobile-menu" id="mobile-menu">
-      <a href="#">Home</a>
+      <a href="/">Home</a>
       <a href="#">Pricing</a>
-      <a href="#">Sign In</a>
-      <a class="cta" href="#">Get Started</a>
+      <a href="/login">Sign In</a>
+      <a class="cta" href="/signup">Get Started</a>
     </div>
   </header>
 
@@ -329,7 +380,8 @@
             <i class="fas fa-envelope icon-left"></i>
             <input id="email" class="form-control" type="email" placeholder="Enter your email" required>
           </div>
-          <div class="error" id="emailError" style="display:none;color:#e34949;font-size:13px;margin-top:6px;">Please enter a valid email</div>
+          <div class="error" id="emailError" style="display:none;color:#e34949;font-size:13px;margin-top:6px;">Please
+            enter a valid email</div>
         </div>
 
         <!-- PASSWORD -->
@@ -353,7 +405,7 @@
 
         <p class="signup-link">
           Don't have an account?
-          <a href="signup.html">Sign Up</a>
+          <a href="/signup">Sign Up</a>
         </p>
       </form>
     </div>
@@ -366,149 +418,150 @@
 
 
 
-<script>
-  /* =========================
-     Mobile menu
-  ========================== */
-  const hamburger = document.getElementById("hamburger");
-  const mobileMenu = document.getElementById("mobile-menu");
+  <script>
+    /* =========================
+       Mobile menu
+    ========================== */
+    const hamburger = document.getElementById("hamburger");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-  if (hamburger && mobileMenu) {
-    hamburger.addEventListener("click", () => {
-      mobileMenu.classList.toggle("open");
-      hamburger.setAttribute(
-        "aria-expanded",
-        mobileMenu.classList.contains("open")
-      );
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener("click", () => {
+        mobileMenu.classList.toggle("open");
+        hamburger.setAttribute(
+          "aria-expanded",
+          mobileMenu.classList.contains("open")
+        );
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+          mobileMenu.classList.remove("open");
+        }
+      });
+    }
+
+    /* =========================
+       Password toggle icons
+    ========================== */
+    document.querySelectorAll(".toggle-password").forEach((icon) => {
+      icon.addEventListener("click", function () {
+        const input = document.getElementById(this.dataset.target);
+        if (!input) return;
+
+        const isHidden = input.type === "password";
+        input.type = isHidden ? "text" : "password";
+
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
+      });
     });
 
-    document.addEventListener("click", (e) => {
-      if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
-        mobileMenu.classList.remove("open");
-      }
-    });
-  }
+    /* =========================
+       Simple email validator
+    ========================== */
+    function validEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
 
-  /* =========================
-     Password toggle icons
-  ========================== */
-  document.querySelectorAll(".toggle-password").forEach((icon) => {
-    icon.addEventListener("click", function () {
-      const input = document.getElementById(this.dataset.target);
-      if (!input) return;
+    /* =========================
+       Form submit — REAL BACKEND
+    ========================== */
+    (function () {
+      const form = document.getElementById("signinForm");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const emailError = document.getElementById("emailError");
+      const rememberCheckbox = document.getElementById("remember");
 
-      const isHidden = input.type === "password";
-      input.type = isHidden ? "text" : "password";
+      if (!form) return;
 
-      this.classList.toggle("fa-eye");
-      this.classList.toggle("fa-eye-slash");
-    });
-  });
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-  /* =========================
-     Simple email validator
-  ========================== */
-  function validEmail(v) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  }
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-  /* =========================
-     Form submit — REAL BACKEND
-  ========================== */
-  (function () {
-    const form = document.getElementById("signinForm");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const emailError = document.getElementById("emailError");
-    const rememberCheckbox = document.getElementById("remember");
+        let ok = true;
 
-    if (!form) return;
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-
-      let ok = true;
-
-      if (!validEmail(email)) {
-        emailError.style.display = "block";
-        ok = false;
-      } else {
-        emailError.style.display = "none";
-      }
-
-      if (!password) {
-        if (ok) passwordInput.focus();
-        ok = false;
-      }
-
-      if (!ok) return;
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Logging in...";
-
-      try {
-        const response = await fetch("/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
-        });
-
-        if (!response.ok) {
-          const text = await response.text();
-          alert(text || "Server error while logging in.");
-          return;
+        if (!validEmail(email)) {
+          emailError.style.display = "block";
+          ok = false;
+        } else {
+          emailError.style.display = "none";
         }
 
-        let data = {};
+        if (!password) {
+          if (ok) passwordInput.focus();
+          ok = false;
+        }
+
+        if (!ok) return;
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Logging in...";
+
         try {
-          data = await response.json();
-        } catch {
-          alert("Login succeeded, but response was not JSON.");
-          return;
+          const response = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: email,
+              password: password,
+            }),
+          });
+
+          if (!response.ok) {
+            const text = await response.text();
+            alert(text || "Server error while logging in.");
+            return;
+          }
+
+          let data = {};
+          try {
+            data = await response.json();
+          } catch {
+            alert("Login succeeded, but response was not JSON.");
+            return;
+          }
+
+          if (!data.ok) {
+            alert(data.message || "Invalid email or password.");
+            return;
+          }
+
+          // ✅ STORE USER ID (THIS WAS MISSING)
+          localStorage.setItem("user_id", data.user_id);
+
+          console.log("Logged in user_id:", data.user_id);
+
+          // (Optional) Remember me
+          if (rememberCheckbox && rememberCheckbox.checked) {
+            // localStorage.setItem("userEmail", email);
+          }
+
+          alert("Login successful ✅");
+
+          // Redirect after login
+          window.location.href = "/database-connection";
+          // or "/" if you prefer
+        } catch (err) {
+          console.error(err);
+          alert("Network error. Try again.");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
         }
-
-        if (!data.ok) {
-  alert(data.message || "Invalid email or password.");
-  return;
-}
-
-// ✅ STORE USER ID (THIS WAS MISSING)
-localStorage.setItem("user_id", data.user_id);
-
-console.log("Logged in user_id:", data.user_id);
-
-// (Optional) Remember me
-if (rememberCheckbox && rememberCheckbox.checked) {
-  // localStorage.setItem("userEmail", email);
-}
-
-alert("Login successful ✅");
-
-// Redirect after login
-window.location.href = "/database-connection";
- // or "/" if you prefer
-      } catch (err) {
-        console.error(err);
-        alert("Network error. Try again.");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      }
-    });
-  })();
-</script>
+      });
+    })();
+  </script>
 
 
 
 
 </body>
+
 </html>
