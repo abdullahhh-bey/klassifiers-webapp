@@ -15,7 +15,7 @@ class AdvancedRagChatService:
         
         self.memory = MemorySaver()
         self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=self.gemini_api_key)
-        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=self.gemini_api_key)
+        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", google_api_key=self.gemini_api_key)
 
     def _get_or_create_schema_vector_db(self, sql_db: SQLDatabase, connection_id: int):
         # We store the vector DB locally per database connection
