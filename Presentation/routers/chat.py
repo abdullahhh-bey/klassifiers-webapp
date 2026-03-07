@@ -40,15 +40,15 @@ def chat_with_database(
             )
 
         try:
-            response_msg = chat_service.process_chat(
+            response_msg = chat_service.chat(
                 user_id=connection.user_id,
+                connection_id=connection.id,
                 db_type=connection.db_type,
                 host=connection.host,
                 port=connection.port,
                 db_name=connection.db_name,
                 username=connection.username,
                 password=decrypted_password,
-                connection_id=connection.id,
                 message=payload.message
             )
             return {"response": response_msg}

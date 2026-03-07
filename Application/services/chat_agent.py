@@ -1,177 +1,254 @@
 import os
 import logging
-from typing import List, Dict, Any, Union
+from typing import Optional
 
-from fastapi import HTTPException
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from langchain_chroma import Chroma
+from langchain_postgres import PGVector                     # Supabase uses Postgres
+from langchain_core.documents import Document
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 
-# Configure basic logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(name)s | %(message)s")
 logger = logging.getLogger(__name__)
 
-class AdvancedRagChatService:
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 1 — CONFIGURATION
+# Load from environment variables (recommended) or hard-code for local testing.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class Config:
+    # ── LLM ──────────────────────────────────────────────────────────────────
+    GEMINI_API_KEY: str = os.getenv("geminiAPI", "")
+
+    # ── Embeddings ───────────────────────────────────────────────────────────
+    HF_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
+    HF_EMBED_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+
+    # ── Supabase Vector Store ─────────────────────────────────────────────────
+    SUPABASE_DB_URL: str = os.getenv("SUPABASE_DB_URL", "")
+    VECTOR_TABLE_NAME: str = "schema_embeddings"
+
+    # ── Agent Behaviour ───────────────────────────────────────────────────────
+    RELEVANT_TABLES_K: int = 5          
+    QUERY_RESULT_LIMIT: int = 10        
+    AGENT_NAME: str = "Koli"            
+
+    # ── Supported DB drivers ──────────────────────────────────────────────────
+    SUPPORTED_DB_TYPES = {"postgresql", "mysql", "clickhouse"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 2 — VALIDATION
+# ─────────────────────────────────────────────────────────────────────────────
+
+def validate_config(cfg: Config) -> None:
+    """Raise early with a clear message if any required key is missing."""
+    missing = []
+    if not cfg.GEMINI_API_KEY:
+        missing.append("geminiAPI (in .env)")
+    if not cfg.HF_API_KEY:
+        missing.append("HUGGINGFACE_API_KEY (in .env)")
+    if not cfg.SUPABASE_DB_URL:
+        missing.append("SUPABASE_DB_URL (in .env)")
+    if missing:
+        raise RuntimeError(
+            "Missing required configuration:\n  " + "\n  ".join(missing)
+        )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 3 — DATABASE URI BUILDER
+# ─────────────────────────────────────────────────────────────────────────────
+
+def build_db_uri(
+    db_type: str, host: str, port: int,
+    db_name: str, username: str, password: str
+) -> str:
     """
-    A service class that implements a Retrieval-Augmented Generation (RAG) agent
-    for querying SQL databases using LangChain and HuggingFace Embeddings.
+    Construct an SQLAlchemy-compatible URI for the TARGET database being queried.
     """
-    def __init__(self):
-        self._initialize_keys()
-        self._setup_models()
-        self.memory = MemorySaver()
-
-    def _initialize_keys(self) -> None:
-        """Load and validate all required API keys from environment."""
-        self.gemini_api_key = os.getenv("geminiAPI")
-        if not self.gemini_api_key:
-            logger.error("geminiAPI key not found in environment variables.")
-            raise RuntimeError("geminiAPI key is missing.")
-            
-        self.hf_api_key = os.getenv("HUGGINGFACE_API_KEY")
-        if not self.hf_api_key:
-            logger.error("HUGGINGFACE_API_KEY not found in environment variables.")
-            raise RuntimeError("HUGGINGFACE_API_KEY is missing. Get one at huggingface.co/settings/tokens")
-
-    def _setup_models(self) -> None:
-        """Initialize the LLM and Embedding models."""
-        # Main LLM for reasoning and SQL generation (Google Gemini)
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash", 
-            api_key=self.gemini_api_key
-        )
-        
-        # HuggingFace Embeddings for vectorizing the database schema
-        # We use a fast, lightweight sentence-transformer model via HuggingFace Inference API
-        self.embeddings = HuggingFaceEndpointEmbeddings(
-            model="sentence-transformers/all-MiniLM-L6-v2",
-            task="feature-extraction",
-            huggingfacehub_api_token=self.hf_api_key,
+    db_type = db_type.lower()
+    if db_type not in Config.SUPPORTED_DB_TYPES:
+        raise ValueError(
+            f"Unsupported DB type '{db_type}'. "
+            f"Supported: {Config.SUPPORTED_DB_TYPES}"
         )
 
-    def _get_db_uri(self, db_type: str, host: str, port: int, db_name: str, username: str, password: str) -> str:
-        """Construct the SQLAlchemy database URI securely."""
-        db_type = db_type.lower()
-        if db_type == "postgresql":
-            return f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{db_name}?sslmode=require"
-        elif db_type == "mysql":
-            return f"mysql+pymysql://{username}:{password}@{host}:{port}/{db_name}"
-        elif db_type == "clickhouse":
-            return f"clickhouse+connect://{username}:{password}@{host}:{port}/{db_name}"
-        else:
-            raise ValueError(f"Unsupported database type: {db_type}")
+    drivers = {
+        "postgresql": f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{db_name}?sslmode=require",
+        "mysql":      f"mysql+pymysql://{username}:{password}@{host}:{port}/{db_name}",
+        "clickhouse": f"clickhouse+connect://{username}:{password}@{host}:{port}/{db_name}",
+    }
+    return drivers[db_type]
 
-    def _get_or_create_schema_vector_db(self, sql_db: SQLDatabase, connection_id: int) -> Chroma:
-        """
-        Extracts the schema from the SQL database and embeds it into a local ChromaDB.
-        If it already exists, it loads the existing ChromaDB to save time.
-        """
-        persist_directory = f"./chroma_db_connections/connection_{connection_id}"
-        os.makedirs("./chroma_db_connections", exist_ok=True)
-        
-        # 1. Load existing DB if available
-        if os.path.exists(persist_directory) and os.listdir(persist_directory):
-            logger.info(f"Loading existing Vector DB for connection {connection_id}")
-            return Chroma(persist_directory=persist_directory, embedding_function=self.embeddings)
-            
-        # 2. Extract schema and build new DB
-        logger.info(f"Extracting schema and building new Vector DB for connection {connection_id}...")
-        tables = sql_db.get_usable_table_names()
-        docs = []
-        
-        for table in tables:
-            try:
-                schema_info = sql_db.get_table_info_no_throw([table])
-                docs.append(f"Table name: {table}\nSchema Details: {schema_info}")
-            except Exception as e:
-                logger.warning(f"Could not extract schema for table {table}: {e}")
-            
-        if not docs:
-            docs = ["No accessible tables found in this database."]
-            
-        # 3. Create and persist the Vector DB
-        vector_db = Chroma.from_texts(
-            texts=docs, 
-            embedding=self.embeddings, 
-            persist_directory=persist_directory
-        )
-        return vector_db
 
-    def _get_relevant_schema(self, vector_db: Chroma, query: str, k: int = 5) -> str:
-        """Retrieve the top k most relevant tables for the user's query."""
-        retriever = vector_db.as_retriever(search_kwargs={"k": k}) 
-        relevant_docs = retriever.invoke(query)
-        return "\n\n".join([doc.page_content for doc in relevant_docs])
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 4 — VECTOR STORE (Supabase pgvector)
+# ─────────────────────────────────────────────────────────────────────────────
 
-    def _create_system_prompt(self, db_type: str, relevant_schema: str) -> str:
-        """Create the dynamic system prompt guiding the LLM."""
-        return f"""You are a helpful database assistant named Koli.
-You are querying a {db_type} database.
+def get_or_build_vector_store(
+    sql_db: SQLDatabase,
+    connection_id: int,
+    embeddings: HuggingFaceEndpointEmbeddings,
+    cfg: Config,
+) -> PGVector:
+    """
+    Extract the schema from the SQL database and persist into Supabase pgvector.
+    On subsequent calls, load existing collection directly.
+    """
+    collection_name = f"schema_conn_{connection_id}"
 
-Based on the user's question, I have already searched the database schema and found the following potentially relevant tables:
+    vector_store = PGVector(
+        embeddings=embeddings,
+        collection_name=collection_name,
+        connection=cfg.SUPABASE_DB_URL,
+        use_jsonb=True,
+    )
 
+    try:
+        existing = vector_store.similarity_search("test", k=1)
+        if existing:
+            logger.info(f"[VectorDB] Loaded existing schema index for connection {connection_id}")
+            return vector_store
+    except Exception:
+        pass
+
+    logger.info(f"[VectorDB] Building schema index for connection {connection_id}...")
+    tables = sql_db.get_usable_table_names()
+    docs = []
+
+    for table in tables:
+        try:
+            schema_info = sql_db.get_table_info_no_throw([table])
+            docs.append(
+                Document(
+                    page_content=f"Table: {table}\n{schema_info}",
+                    metadata={"table_name": table, "connection_id": str(connection_id)},
+                )
+            )
+        except Exception as e:
+            logger.warning(f"[VectorDB] Skipping table '{table}': {e}")
+
+    if not docs:
+        docs = [Document(page_content="No accessible tables found.", metadata={})]
+
+    vector_store.add_documents(docs)
+    logger.info(f"[VectorDB] Indexed {len(docs)} table(s) into Supabase.")
+    return vector_store
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 5 — RETRIEVAL
+# ─────────────────────────────────────────────────────────────────────────────
+
+def retrieve_relevant_schema(
+    vector_store: PGVector, query: str, k: int
+) -> str:
+    retriever = vector_store.as_retriever(search_kwargs={"k": k})
+    relevant_docs = retriever.invoke(query)
+    return "\n\n".join(doc.page_content for doc in relevant_docs)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 6 — SYSTEM PROMPT BUILDER
+# ─────────────────────────────────────────────────────────────────────────────
+
+def build_system_prompt(db_type: str, relevant_schema: str, cfg: Config) -> str:
+    return f"""You are a database assistant named {cfg.AGENT_NAME}.
+You are connected to a {db_type.upper()} database.
+
+Relevant table schemas:
 {relevant_schema}
 
-INSTRUCTIONS:
-1. ONLY utilize the tables provided in the schema above to answer the user's question. If you absolutely need a table that isn't listed, you can use your tools to discover it, but heavily prefer the ones listed above.
-2. Given the input question, create a syntactically correct SQL query to run.
-3. Look at the results of the query and return the answer.
-4. Limit your query to 10 results unless specified otherwise.
-5. NEVER make any DML statements (INSERT, UPDATE, DELETE, DROP etc.).
-6. Explain the result to the user clearly.
+RULES:
+1. ONLY use the tables listed above. Do not invent names.
+2. Write {db_type.upper()} SQL.
+3. LIMIT results to {cfg.QUERY_RESULT_LIMIT}.
+4. NO DML (INSERT, UPDATE, DELETE).
+5. Explain the result clearly.
 """
 
-    def process_chat(self, user_id: int, db_type: str, host: str, port: int, db_name: str, username: str, password: str, connection_id: int, message: str) -> str:
-        """
-        Main entry point for processing a chat message against a specific database.
-        """
-        # 1. Connect to Database
-        db_uri = self._get_db_uri(db_type, host, port, db_name, username, password)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 7 — MAIN AGENT SERVICE
+# ─────────────────────────────────────────────────────────────────────────────
+
+class RagSqlAgentService:
+    def __init__(self):
+        self.cfg = Config()
+        validate_config(self.cfg)
+        self._setup_models()
+        self.memory = MemorySaver()
+        logger.info("[Service] RagSqlAgentService initialised successfully.")
+
+    def _setup_models(self) -> None:
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
+            api_key=self.cfg.GEMINI_API_KEY,
+            temperature=0, 
+        )
+        self.embeddings = HuggingFaceEndpointEmbeddings(
+            model=self.cfg.HF_EMBED_MODEL,
+            task="feature-extraction",
+            huggingfacehub_api_token=self.cfg.HF_API_KEY,
+        )
+
+    def chat(
+        self,
+        user_id: int,
+        connection_id: int,
+        db_type: str,
+        host: str,
+        port: int,
+        db_name: str,
+        username: str,
+        password: str,
+        message: str,
+    ) -> str:
+        db_uri = build_db_uri(db_type, host, port, db_name, username, password)
         sql_db = SQLDatabase.from_uri(db_uri)
 
-        # 2. Retrieve Relevant Schema (RAG)
-        vector_db = self._get_or_create_schema_vector_db(sql_db, connection_id)
-        relevant_schema = self._get_relevant_schema(vector_db, message)
+        vector_store = get_or_build_vector_store(
+            sql_db, connection_id, self.embeddings, self.cfg
+        )
+        relevant_schema = retrieve_relevant_schema(
+            vector_store, message, k=self.cfg.RELEVANT_TABLES_K
+        )
 
-        # 3. Setup Tools & Prompt
+        system_prompt = build_system_prompt(db_type, relevant_schema, self.cfg)
         toolkit = SQLDatabaseToolkit(db=sql_db, llm=self.llm)
         tools = toolkit.get_tools()
-        system_prompt = self._create_system_prompt(db_type, relevant_schema)
 
-        # 4. Initialize Agent
-        agent_executor = create_react_agent(
+        agent = create_react_agent(
             self.llm,
             tools,
             prompt=system_prompt,
             checkpointer=self.memory,
         )
 
-        # 5. Execute Agent with Session Thread
-        thread_id = f"user_{user_id}_db_{connection_id}"
+        thread_id = f"user_{user_id}_conn_{connection_id}"
         config = {"configurable": {"thread_id": thread_id}}
-        
+
         try:
-            response = agent_executor.invoke({"messages": [("user", message)]}, config=config)
+            response = agent.invoke(
+                {"messages": [("user", message)]},
+                config=config,
+            )
         except Exception as e:
-            logger.error(f"Agent execution failed: {e}")
-            return f"An error occurred while processing your request: {e}"
+            logger.error(f"[Agent] Execution failed: {e}", exc_info=True)
+            return f"Sorry, something went wrong while processing your request: {e}"
 
-        # 6. Parse and Return Response
-        final_msg_raw = response["messages"][-1].content
-        if isinstance(final_msg_raw, list):
-            parts = []
-            for part in final_msg_raw:
-                if isinstance(part, str):
-                    parts.append(part)
-                elif isinstance(part, dict) and "text" in part:
-                    parts.append(part["text"])
-            return "".join(parts)
-            
-        return str(final_msg_raw)
+        raw = response["messages"][-1].content
+        if isinstance(raw, list):
+            return "".join(
+                part if isinstance(part, str) else part.get("text", "")
+                for part in raw
+            )
+        return str(raw)
 
-# Instantiate a single instance of the service
-chat_service = AdvancedRagChatService()
+# Provide single export reference for router:
+chat_service = RagSqlAgentService()
