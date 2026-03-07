@@ -2,7 +2,7 @@ import os
 import logging
 from typing import Optional
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 class Config:
     # ── LLM ──────────────────────────────────────────────────────────────────
-    GEMINI_API_KEY: str = os.getenv("geminiAPI", "")
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
     # ── Embeddings ───────────────────────────────────────────────────────────
     HF_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
@@ -48,8 +48,8 @@ class Config:
 def validate_config(cfg: Config) -> None:
     """Raise early with a clear message if any required key is missing."""
     missing = []
-    if not cfg.GEMINI_API_KEY:
-        missing.append("geminiAPI (in .env)")
+    if not cfg.GROQ_API_KEY:
+        missing.append("GROQ_API_KEY (in .env)")
     if not cfg.HF_API_KEY:
         missing.append("HUGGINGFACE_API_KEY (in .env)")
     if not cfg.SUPABASE_DB_URL:
@@ -161,15 +161,23 @@ def build_system_prompt(db_type: str, relevant_schema: str, cfg: Config) -> str:
     return f"""You are a database assistant named {cfg.AGENT_NAME}.
 You are connected to a {db_type.upper()} database.
 
+CRITICAL INSTRUCTIONS:
+You currently DO NOT know the actual data inside the database. The text below only contains the structure (schema) of the tables.
 Relevant table schemas:
 {relevant_schema}
 
 RULES:
-1. ONLY use the tables listed above. Do not invent names.
-2. Write {db_type.upper()} SQL.
-3. LIMIT results to {cfg.QUERY_RESULT_LIMIT}.
-4. NO DML (INSERT, UPDATE, DELETE).
-5. Explain the result clearly.
+1. You MUST write and execute an SQL query using your tools to find the answer. NEVER guess or answer based just on the schema.
+2. ONLY use the tables listed above. Do not invent names.
+3. Write {db_type.upper()} SQL.
+4. LIMIT results to {cfg.QUERY_RESULT_LIMIT}.
+5. NO DML (INSERT, UPDATE, DELETE).
+6. Explain the result clearly after executing the query.
+
+WARNING: You are strictly forbidden from answering the user's question until you have successfully executed the `sql_db_query` tool to retrieve exactly the records matching their request!
+
+TOOL USAGE INSTRUCTIONS:
+When calling tools, you must ensure your JSON payload is perfectly formatted and escaped. Do NOT include markdown blocks around your tool calls.
 """
 
 
@@ -186,9 +194,9 @@ class RagSqlAgentService:
         logger.info("[Service] RagSqlAgentService initialised successfully.")
 
     def _setup_models(self) -> None:
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            api_key=self.cfg.GEMINI_API_KEY,
+        self.llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            api_key=self.cfg.GROQ_API_KEY,
             temperature=0, 
         )
         self.embeddings = HuggingFaceEndpointEmbeddings(
